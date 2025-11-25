@@ -24,9 +24,4 @@ export interface PropertyImage {
   created_at: string;
 }
 
-export type PropertyStatus =
-  | "To View"
-  | "Viewed-Pending"
-  | "Finalist"
-  | "Rejected"
-  | "Contract Signed";
+export type PropertyStatus = "Pending" | "Reviewed" | "Rejected";

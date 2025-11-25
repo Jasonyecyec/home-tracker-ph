@@ -20,9 +20,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { ClipboardPaste } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
+import { PropertyFormSchema, propertySchema } from "@/schemas/property.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface PropertyFormProps {
   isOpen: boolean;
@@ -37,40 +40,28 @@ const propertyTypes = [
   "Studio",
   "Other",
 ];
-const statuses: PropertyStatus[] = [
-  "To View",
-  "Viewed-Pending",
-  "Finalist",
-  "Rejected",
-  "Contract Signed",
-];
+const statuses: PropertyStatus[] = ["Pending", "Reviewed", "Rejected"];
 
 export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    property_type: "",
-    rent_price: "",
-    location: "",
-    contact_info: "",
-    notes: "",
-    status: "To View" as PropertyStatus,
+  const {
+    register,
+    setValue,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PropertyFormSchema>({
+    resolver: zodResolver(propertySchema),
+    defaultValues: {
+      status: "Pending",
+    },
   });
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: PropertyFormSchema) => {
+    console.log("Form Data:", data);
+    // e.preventDefault();
     // const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -104,7 +95,7 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
       <DialogContent
-        className="min-w-4xl"
+        className="min-w-3xl"
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
@@ -115,95 +106,129 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* URL Link */}
+          <div className="space-y-2 relative">
+            <Label htmlFor="url_link">URL Link</Label>
+            <Input
+              id="url_link"
+              placeholder="e.g., Sunset Condo"
+              className="h-12 text-blue-500"
+              {...register("url_link")}
+            />
+
+            {errors.url_link && (
+              <p className="text-xs text-destructive">
+                {errors.url_link.message}
+              </p>
+            )}
+
+            <Button
+              size="icon"
+              type="button"
+              aria-label="Paste listing link"
+              className="absolute top-7 right-2 "
+              onClick={() => {
+                navigator.clipboard.readText().then((text) => {
+                  setValue("url_link", text);
+                });
+              }}
+            >
+              <ClipboardPaste />
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Property Name</Label>
+              <Label htmlFor="property_name">Property Name</Label>
               <Input
-                id="name"
-                name="name"
+                id="property_name"
                 placeholder="e.g., Sunset Condo"
-                value={formData.name}
-                onChange={handleChange}
-                required
+                {...register("property_name")}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="property_type">Property Type</Label>
-              <Select
-                value={formData.property_type}
-                onValueChange={(value) =>
-                  handleSelectChange("property_type", value)
-                }
-              >
-                <SelectTrigger id="property_type">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {propertyTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="property_type"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="property_type" className="w-full">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {propertyTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="rent_price">Rent Price (PHP)</Label>
+              <Label htmlFor="rent_price">Rent / Price (PHP)</Label>
               <Input
                 id="rent_price"
-                name="rent_price"
                 type="number"
                 placeholder="0.00"
-                value={formData.rent_price}
-                onChange={handleChange}
-                required
+                {...register("rent_price")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">Location (City)</Label>
               <Input
                 id="location"
-                name="location"
                 placeholder="e.g., Makati, Manila"
-                value={formData.location}
-                onChange={handleChange}
-                required
+                {...register("location")}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="contact_info">Contact Info</Label>
+              <Label htmlFor="contact">Contact Info</Label>
               <Input
-                id="contact_info"
-                name="contact_info"
-                placeholder="Phone or agent name"
-                value={formData.contact_info}
-                onChange={handleChange}
+                id="contact"
+                type="tel"
+                placeholder="09xx xxx xxxx"
+                {...register("contact")}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleSelectChange("status", value)}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {statuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="status" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
 
@@ -211,12 +236,10 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
             <Label htmlFor="notes">Notes</Label>
             <textarea
               id="notes"
-              name="notes"
               placeholder="Any additional notes about the property"
-              value={formData.notes}
-              onChange={handleChange}
               rows={3}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              {...register("notes")}
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base"
             />
           </div>
 

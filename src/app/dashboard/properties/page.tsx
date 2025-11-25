@@ -6,6 +6,7 @@ import { useState } from "react";
 
 export default function Property() {
   const [isOpenForm, setIsOpenForm] = useState<boolean>(false);
+
   return (
     <div className="p-5 border rounded-md">
       <div className="flex items-center justify-between">
