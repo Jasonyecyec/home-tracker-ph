@@ -143,7 +143,7 @@ function ImageUpload({
             onChange={handleChange}
             className="sr-only"
           />
-          <div className="flex flex-col items-center justify-center text-center space-y-2 pointer-events-none">
+          <div className="flex flex-col items-center justify-center text-center space-y-2 pointer-events-none ">
             <div className="p-3 rounded-full bg-primary/10">
               <Upload className="h-6 w-6 text-primary" />
             </div>
@@ -433,7 +433,6 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          {/* <div className="flex gap-2 justify-end"> */}
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" className="cursor-pointer">
@@ -444,7 +443,6 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
               Save changes
             </Button>
           </DialogFooter>
-          {/* </div>   */}
         </form>
       </DialogContent>
     </Dialog>

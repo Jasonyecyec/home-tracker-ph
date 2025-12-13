@@ -16,6 +16,8 @@ import {
   GalleryThumbnails,
   Home,
   LayoutDashboard,
+  User,
+  User2,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -30,6 +32,11 @@ const items = [
     title: "Properties",
     url: "/dashboard/properties",
     icon: Building2,
+  },
+  {
+    title: "Users",
+    url: "/dashboard/users",
+    icon: User,
   },
 ];
 
