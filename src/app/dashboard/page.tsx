@@ -105,6 +105,7 @@ export default function Dashboard() {
           ] as const
         ).map((status) => (
           <button
+            type="button"
             key={status}
             onClick={() => setStatusFilter(status)}
             className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
