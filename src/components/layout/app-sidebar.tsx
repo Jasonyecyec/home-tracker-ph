@@ -12,16 +12,41 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import {
   Building2,
+  ChevronsUpDown,
   GalleryThumbnails,
-  Home,
   LayoutDashboard,
+  LogOut,
   User,
-  User2,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import {
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-// Menu items.
+// Menu items
 const items = [
   {
     title: "Dashboard",
@@ -41,7 +66,25 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const router = useRouter();
+  const supabase = createClient();
   const path = usePathname();
+  const isMobile = useIsMobile();
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      if (!error) {
+        router.push("/");
+        return;
+      }
+
+      toast.error(error?.message);
+    } catch {
+      toast.error("An unexpected error occurred. Please try again.");
+    }
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -78,7 +121,88 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton size="lg">
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src="#" alt="test" />
+                    <AvatarFallback className="rounded-lg">SN</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-start text-sm leading-tight">
+                    <span className="truncate font-semibold">jason</span>
+                    <span className="truncate text-xs">
+                      jason.yecyec023@gmail.com
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ms-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                side={isMobile ? "top" : "right"}
+                sideOffset={20}
+                align="end"
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src="Jason" alt={"#"} />
+                      <AvatarFallback className="rounded-lg">SN</AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-start text-sm leading-tight">
+                      <span className="truncate font-semibold">Jason</span>
+                      <span className="truncate text-xs">
+                        jason.yecyec023@gmail.com
+                      </span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="text-destructive w-full flex justify-start hover:bg-destructive/10 hover:text-destructive transition-colors"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Sign out
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your account and remove your data from our
+                        servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel type="button">
+                        Cancel
+                      </AlertDialogCancel>
+                      <Button
+                        variant="destructive"
+                        type="submit"
+                        onClick={handleSignOut}
+                      >
+                        Continue
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
