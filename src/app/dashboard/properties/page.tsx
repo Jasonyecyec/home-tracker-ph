@@ -2,7 +2,7 @@
 import PropertyForm from "@/components/properties/property-form";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Link, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -42,6 +42,7 @@ export default function Property() {
           <p>Location: {property.location}</p>
           <p>Rent Price: ${property.rent_price}</p>
           <p>Status: {property.status}</p>
+          <Link href={property.url_link}>{property.url_link}</Link>
         </div>
       ))}
     </div>
