@@ -200,7 +200,7 @@ function ImageUpload({
 export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: createProperty } = useMutation({
+  const { mutateAsync: createProperty, isPending: isSaving } = useMutation({
     mutationKey: ["properties"],
     mutationFn: async (payload: FormData) => {
       const response = await fetch("/api/properties", {
@@ -452,12 +452,16 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <DialogFooter>
-            <DialogClose asChild>
+            <DialogClose asChild disabled={isSaving}>
               <Button variant="outline" className="cursor-pointer">
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" className="cursor-pointer">
+            <Button
+              type="submit"
+              className="cursor-pointer"
+              disabled={isSaving}
+            >
               Save changes
             </Button>
           </DialogFooter>

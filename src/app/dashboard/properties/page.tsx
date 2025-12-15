@@ -2,7 +2,8 @@
 import PropertyForm from "@/components/properties/property-form";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,6 +23,8 @@ export default function Property() {
 
   if (isPending) return <div>Loading...</div>;
 
+  console.log("Properties data:", data);
+
   return (
     <div className="p-5 border rounded-md">
       <div className="flex items-center justify-between">
@@ -40,9 +43,19 @@ export default function Property() {
           <h3 className="text-xl font-semibold">{property.property_name}</h3>
           <p>Type: {property.property_type}</p>
           <p>Location: {property.location}</p>
-          <p>Rent Price: ${property.rent_price}</p>
+          <p>Rent Price: {property.rent_price}</p>
           <p>Status: {property.status}</p>
-          <Link href={property.url_link}>{property.url_link}</Link>
+          <p>
+            URL Link:{" "}
+            <Link
+              href={property.url_link}
+              target="_blank"
+              className="text-blue-600 hover:text- hover:text-blue-700 transition-colors"
+            >
+              {" "}
+              {property.url_link}
+            </Link>
+          </p>
         </div>
       ))}
     </div>
