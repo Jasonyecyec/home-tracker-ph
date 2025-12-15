@@ -19,7 +19,6 @@ import { LoginFormSchema, loginSchema } from "@/schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
-import { FieldSeparator } from "@/components/ui/field";
 
 export default function Home() {
   const supabase = createClient();
@@ -57,15 +56,15 @@ export default function Home() {
 
   const handleGoogleButton = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       });
-      console.log("data", data);
-      console.log("error", error);
-    } catch (error) {}
+    } catch {
+      toast.error("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (

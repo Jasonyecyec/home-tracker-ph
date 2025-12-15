@@ -30,6 +30,8 @@ import { Controller, useForm } from "react-hook-form";
 import { PropertyFormSchema, propertySchema } from "@/schemas/property.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface PropertyFormProps {
   isOpen: boolean;
@@ -196,10 +198,37 @@ function ImageUpload({
 }
 
 export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: createProperty } = useMutation({
+    mutationKey: ["properties"],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch("/api/properties", {
+        method: "POST",
+        body: payload,
+      });
+
+      if (!response.ok) {
+        throw new Error();
+      }
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      onChange(false);
+      reset();
+      toast.success("Property created successfully");
+    },
+    onError: () => {
+      toast.error("Failed to create property");
+    },
+  });
+
   const {
     register,
     setValue,
     control,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<PropertyFormSchema>({
@@ -211,38 +240,27 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
   });
 
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: PropertyFormSchema) => {
-    console.log("Form Data:", data);
-    // e.preventDefault();
-    // const supabase = createClient();
-    setIsLoading(true);
     setError(null);
 
     try {
-      //   const {
-      //     data: { user },
-      //   } = await supabase.auth.getUser();
-      //   if (!user) throw new Error("User not authenticated");
-      //   const { error: insertError } = await supabase.from("properties").insert([
-      //     {
-      //       user_id: user.id,
-      //       name: formData.name,
-      //       property_type: formData.property_type,
-      //       rent_price: parseFloat(formData.rent_price),
-      //       location: formData.location,
-      //       contact_info: formData.contact_info,
-      //       notes: formData.notes,
-      //       status: formData.status,
-      //     },
-      //   ]);
-      //   if (insertError) throw insertError;
-      // onSuccess();
+      const formData = new FormData();
+      formData.append("url_link", data.url_link);
+      formData.append("property_name", data.property_name || "");
+      formData.append("property_type", data.property_type);
+      formData.append("rent_price", data.rent_price.toString());
+      formData.append("location", data.location);
+      formData.append("contact", data.contact || "");
+      formData.append("status", data.status);
+      formData.append("notes", data.notes || "");
+      if (data.image instanceof File) {
+        formData.append("image", data.image);
+      }
+
+      await createProperty(formData);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
