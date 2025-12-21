@@ -16,16 +16,14 @@ export async function DELETE(
     );
   }
 
-  const { data, error } = await supabase
-    .from("properties")
-    .delete()
-    .eq("id", id)
-    .select()
-    .single();
+  const { error } = await supabase.from("properties").delete().eq("id", id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json(
+    { message: "Property deleted successfully" },
+    { status: 200 }
+  );
 }

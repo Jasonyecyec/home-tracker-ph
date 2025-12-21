@@ -16,7 +16,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 export default function Property() {
@@ -48,11 +47,13 @@ export default function Property() {
       if (!response.ok) {
         throw new Error();
       }
+
+      return response.json();
     },
 
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
-      toast.success("Property deleted successfully");
+      toast.success(data.message || "Property deleted successfully");
     },
     onError: () => {
       toast.error("Failed to delete property");
