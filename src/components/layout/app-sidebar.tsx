@@ -21,7 +21,7 @@ import {
   GalleryThumbnails,
   LayoutDashboard,
   LogOut,
-  User,
+  UserIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
@@ -45,6 +45,9 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+// Types
+import { User } from "@/types/User.type";
 
 // Menu items
 const items = [
@@ -61,7 +64,7 @@ const items = [
   {
     title: "Users",
     url: "/dashboard/users",
-    icon: User,
+    icon: UserIcon,
   },
 ];
 
@@ -70,6 +73,7 @@ export function AppSidebar() {
   const supabase = createClient();
   const path = usePathname();
   const isMobile = useIsMobile();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const handleSignOut = async () => {
     try {
@@ -85,6 +89,21 @@ export function AppSidebar() {
       toast.error("An unexpected error occurred. Please try again.");
     }
   };
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const extractedData = {
+        id: user?.id,
+        ...user?.user_metadata,
+      };
+      setCurrentUser(extractedData as User);
+    };
+
+    checkUser();
+  }, [supabase]);
 
   return (
     <Sidebar collapsible="icon">
@@ -129,13 +148,18 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src="#" alt="test" />
+                    <AvatarImage
+                      src={currentUser?.avatar_url}
+                      alt={currentUser?.name}
+                    />
                     <AvatarFallback className="rounded-lg">SN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
-                    <span className="truncate font-semibold">jason</span>
+                    <span className="truncate font-semibold">
+                      {currentUser?.name}
+                    </span>
                     <span className="truncate text-xs">
-                      jason.yecyec023@gmail.com
+                      {currentUser?.email}
                     </span>
                   </div>
                   <ChevronsUpDown className="ms-auto size-4" />
@@ -150,13 +174,18 @@ export function AppSidebar() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src="Jason" alt={"#"} />
+                      <AvatarImage
+                        src={currentUser?.avatar_url}
+                        alt={currentUser?.name}
+                      />
                       <AvatarFallback className="rounded-lg">SN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-start text-sm leading-tight">
-                      <span className="truncate font-semibold">Jason</span>
+                      <span className="truncate font-semibold">
+                        {currentUser?.name}
+                      </span>
                       <span className="truncate text-xs">
-                        jason.yecyec023@gmail.com
+                        {currentUser?.email}
                       </span>
                     </div>
                   </div>

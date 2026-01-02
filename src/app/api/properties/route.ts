@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema } from "@/schemas/property.schema";
+import { uploadImageToSupabase, getImageUrl } from "@/lib/storage";
 
 export async function GET() {
   const supabase = await createClient();
@@ -12,7 +13,17 @@ export async function GET() {
   if (error)
     return NextResponse.json({ message: error.message }, { status: 500 });
 
-  return NextResponse.json(data);
+  // Add image URLs to each property
+  const propertiesWithImages = await Promise.all(
+    (data || []).map(async (property) => {
+      if (property.image) {
+        property.image = await getImageUrl(supabase, property.image);
+      }
+      return property;
+    }),
+  );
+
+  return NextResponse.json(propertiesWithImages);
 }
 
 export async function POST(request: Request) {
@@ -64,6 +75,25 @@ export async function POST(request: Request) {
     );
   }
 
+  // Handle image upload to storage
+  let imagePath: string | null = null;
+
+  if (parsed.data.image instanceof File) {
+    const uploadResult = await uploadImageToSupabase(
+      supabase,
+      parsed.data.image,
+    );
+
+    if (!uploadResult.success) {
+      return NextResponse.json(
+        { error: `Image upload failed: ${uploadResult.error}` },
+        { status: 500 },
+      );
+    }
+
+    imagePath = uploadResult.fileName ?? null;
+  }
+
   const { data, error } = await supabase
     .from("properties")
     .insert([
@@ -78,6 +108,7 @@ export async function POST(request: Request) {
         status: parsed.data.status,
         notes: parsed.data.notes ?? null,
         contact: parsed.data.contact ?? null,
+        image: imagePath,
       },
     ])
     .select()

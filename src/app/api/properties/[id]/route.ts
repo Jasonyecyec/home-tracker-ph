@@ -24,6 +24,6 @@ export async function DELETE(
 
   return NextResponse.json(
     { message: "Property deleted successfully" },
-    { status: 200 }
+    { status: 200 },
   );
 }

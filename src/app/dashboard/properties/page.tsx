@@ -2,8 +2,7 @@
 import PropertyForm from "@/components/properties/property-form";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -17,8 +16,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import PropertyCard from "@/components/properties/property-card";
+// Types
+import { Property } from "@/types/Property.type";
 
-export default function Property() {
+export default function PropertyPage() {
   const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
   const [isOpenForm, setIsOpenForm] = useState<boolean>(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(
@@ -36,6 +38,8 @@ export default function Property() {
       return response.json();
     },
   });
+
+  console.log("Properties data:", data);
 
   const { mutateAsync: deleteProperty, isPending: isDeleting } = useMutation({
     mutationKey: ["properties"],
@@ -81,41 +85,16 @@ export default function Property() {
 
       <PropertyForm isOpen={isOpenForm} onChange={setIsOpenForm} />
 
-      {data?.map((property: any) => (
-        <div
-          key={property.id}
-          className="mt-4 p-4 border rounded-md flex justify-between"
-        >
-          <div>
-            <h3 className="text-xl font-semibold">{property.property_name}</h3>
-            <p>Type: {property.property_type}</p>
-            <p>Location: {property.location}</p>
-            <p>Rent Price: {property.rent_price}</p>
-            <p>Status: {property.status}</p>
-            <p>
-              URL Link:{" "}
-              <Link
-                href={property.url_link}
-                target="_blank"
-                className="text-blue-600 hover:text- hover:text-blue-700 transition-colors"
-              >
-                {property.url_link}
-              </Link>
-            </p>
-          </div>
-
-          <Button
-            variant="outline"
-            onClick={() => {
-              setSelectedPropertyId(property.id);
-              setIsOpenDialog(true);
-            }}
-            className="text-destructive hover:bg-destructive/80 hover:text-white transition-colors"
-          >
-            <Trash2 />
-          </Button>
-        </div>
-      ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
+        {data?.map((property: Property) => (
+          <PropertyCard
+            property={property}
+            key={property.id}
+            setSelectedPropertyId={setSelectedPropertyId}
+            setIsOpenDialog={setIsOpenDialog}
+          />
+        ))}
+      </div>
 
       <AlertDialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
         <AlertDialogContent>

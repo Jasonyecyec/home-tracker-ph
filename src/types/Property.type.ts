@@ -1,7 +1,7 @@
 export interface Property {
-  id: string;
+  id: number;
   user_id: string;
-  name: string;
+  property_name: string;
   property_type: string;
   rent_price: number;
   location: string;
@@ -15,6 +15,9 @@ export interface Property {
     | "Contract Signed";
   created_at: string;
   updated_at: string;
+  image: string;
+  url_link: string;
+  contact: string;
 }
 
 export interface PropertyImage {
