@@ -16,10 +16,36 @@ export async function DELETE(
     );
   }
 
-  const { error } = await supabase.from("properties").delete().eq("id", id);
+  // Find property to delete
+  const { data: property, error: checkError } = await supabase
+    .from("properties")
+    .select()
+    .eq("id", id)
+    .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (checkError) {
+    return NextResponse.json({ error: checkError.message }, { status: 500 });
+  }
+
+  // Remove image from storage if exists
+  if (property.image) {
+    const { error: storageError } = await supabase.storage
+      .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "")
+      .remove([property.image]);
+
+    if (storageError) {
+      console.error("Storage deletion failed:", storageError);
+    }
+  }
+
+  // Delete property
+  const { error: deleteError } = await supabase
+    .from("properties")
+    .delete()
+    .eq("id", id);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 });
   }
 
   return NextResponse.json(

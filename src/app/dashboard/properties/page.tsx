@@ -1,14 +1,10 @@
 "use client";
-import PropertyForm from "@/components/properties/property-form";
-import { Button } from "@/components/ui/button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
+import { useState } from "react";
+
+// Components
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -17,8 +13,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PropertyCard from "@/components/properties/property-card";
+import PropertyForm from "@/components/properties/property-form";
+import { Button } from "@/components/ui/button";
 // Types
 import { Property } from "@/types/Property.type";
+// Externals
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export default function PropertyPage() {
   const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
@@ -38,8 +40,6 @@ export default function PropertyPage() {
       return response.json();
     },
   });
-
-  console.log("Properties data:", data);
 
   const { mutateAsync: deleteProperty, isPending: isDeleting } = useMutation({
     mutationKey: ["properties"],
@@ -107,13 +107,13 @@ export default function PropertyPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               onClick={hanndleDeleteProperty}
               disabled={isDeleting}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
               Delete
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

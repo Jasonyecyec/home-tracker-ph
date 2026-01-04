@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 interface UploadImageResult {
   success: boolean;
-  fileName?: string;
+  filePath?: string;
   error?: string;
 }
 
@@ -15,7 +15,7 @@ export async function uploadImageToSupabase(
     const fileName = `${Date.now()}-${file.name}`;
     const filePath = `${folder}/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
+    const { data, error: uploadError } = await supabase.storage
       .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "")
       .upload(filePath, file);
 
@@ -28,7 +28,7 @@ export async function uploadImageToSupabase(
 
     return {
       success: true,
-      fileName,
+      filePath: data.path,
     };
   } catch (error) {
     return {
@@ -70,11 +70,9 @@ export async function deleteImage(
 
 export async function getImageUrl(
   supabase: SupabaseClient,
-  fileName: string,
-  folder = "properties",
+  filePath: string,
   expiration = 3600,
 ): Promise<string> {
-  const filePath = `${folder}/${fileName}`;
   const { data } = await supabase.storage
     .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "")
     .createSignedUrl(filePath, expiration); // 1 hour expiration

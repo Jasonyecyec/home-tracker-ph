@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       );
     }
 
-    imagePath = uploadResult.fileName ?? null;
+    imagePath = uploadResult.filePath ?? null;
   }
 
   const { data, error } = await supabase
