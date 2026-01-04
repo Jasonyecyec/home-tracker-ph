@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import { createClient } from "@/lib/supabase/client";
 //Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,8 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 // Types
-import { PropertyStatus } from "@/types/Property.type";
-
 import { ClipboardPaste, Upload, X, Image as ImageIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { PropertyFormSchema, propertySchema } from "@/schemas/property.schema";
@@ -32,21 +29,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { propertyStatus, propertyTypes } from "@/lib/constant";
 
 interface PropertyFormProps {
   isOpen: boolean;
   onChange: (isOpen: boolean) => void;
 }
-
-const propertyTypes = [
-  "Condo",
-  "Apartment",
-  "House",
-  "Townhouse",
-  "Studio",
-  "Other",
-];
-const statuses: PropertyStatus[] = ["Pending", "Reviewed", "Rejected"];
 
 // Image Upload Component
 function ImageUpload({
@@ -234,7 +222,7 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
   } = useForm<PropertyFormSchema>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
-      status: "Pending",
+      status: "pending",
       image: undefined,
     },
   });
@@ -260,6 +248,7 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
 
       await createProperty(formData);
     } catch (err: unknown) {
+      console.log(err);
       setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
@@ -404,12 +393,16 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
                     value={field.value}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger id="status" className="w-full">
+                    <SelectTrigger id="status" className="w-full capitalize">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {statuses.map((status) => (
-                        <SelectItem key={status} value={status}>
+                      {propertyStatus.map((status) => (
+                        <SelectItem
+                          key={status}
+                          value={status}
+                          className="capitalize"
+                        >
                           {status}
                         </SelectItem>
                       ))}

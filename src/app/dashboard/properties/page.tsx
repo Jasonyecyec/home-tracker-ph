@@ -42,7 +42,6 @@ export default function PropertyPage() {
   });
 
   const { mutateAsync: deleteProperty, isPending: isDeleting } = useMutation({
-    mutationKey: ["properties"],
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/properties/${id}`, {
         method: "DELETE",
@@ -63,6 +62,29 @@ export default function PropertyPage() {
       toast.error("Failed to delete property");
     },
   });
+
+  const { mutateAsync: updatePropertyStatus, isPending: isUpdating } =
+    useMutation({
+      mutationFn: async ({ id, status }: { id: number; status: string }) => {
+        const response = await fetch(`/api/properties/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status }),
+        });
+
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        return response.json();
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ["properties"] });
+        toast.success(data.message || "Property status updated successfully");
+      },
+      onError: () => {
+        toast.error("Failed to update property status");
+      },
+    });
 
   const hanndleDeleteProperty = async () => {
     if (!selectedPropertyId) return;
@@ -92,6 +114,8 @@ export default function PropertyPage() {
             key={property.id}
             setSelectedPropertyId={setSelectedPropertyId}
             setIsOpenDialog={setIsOpenDialog}
+            handleUpdateStatus={updatePropertyStatus}
+            isLoading={isUpdating}
           />
         ))}
       </div>

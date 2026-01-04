@@ -7,12 +7,7 @@ export interface Property {
   location: string;
   contact_info?: string;
   notes?: string;
-  status:
-    | "To View"
-    | "Viewed-Pending"
-    | "Finalist"
-    | "Rejected"
-    | "Contract Signed";
+  status: PropertyStatus;
   created_at: string;
   updated_at: string;
   image: string;
@@ -27,4 +22,4 @@ export interface PropertyImage {
   created_at: string;
 }
 
-export type PropertyStatus = "Pending" | "Reviewed" | "Rejected";
+export type PropertyStatus = "pending" | "reviewed" | "rejected";

@@ -12,7 +12,7 @@ export const propertySchema = z.object({
   rent_price: z.coerce
     .number<string | number>({ error: "Rent price must be a number" })
     .min(0, "Rent price cannot be negative"),
-  status: z.enum(["Pending", "Reviewed", "Rejected"]),
+  status: z.enum(["pending", "reviewed", "rejected"]),
   notes: z.string().optional(),
   contact: z.string().optional(),
   image: z.file().optional().nullable(),

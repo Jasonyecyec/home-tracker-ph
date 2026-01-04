@@ -53,3 +53,29 @@ export async function DELETE(
     { status: 200 },
   );
 }
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const payload = await request.json();
+
+  const supabase = await createClient();
+
+  console.log("Payload:", payload);
+
+  const { error } = await supabase
+    .from("properties")
+    .update(payload)
+    .eq("id", id);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(
+    { message: "Property updated successfully" },
+    { status: 200 },
+  );
+}

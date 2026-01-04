@@ -12,7 +12,8 @@ export async function uploadImageToSupabase(
   folder = "properties",
 ): Promise<UploadImageResult> {
   try {
-    const fileName = `${Date.now()}-${file.name}`;
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const fileName = `${Date.now()}-${sanitizedName}`;
     const filePath = `${folder}/${fileName}`;
 
     const { data, error: uploadError } = await supabase.storage
