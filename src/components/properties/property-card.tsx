@@ -1,36 +1,32 @@
 import Link from "next/link";
 // Components
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardDescription,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 // Types
-import { Property } from "@/types/Property.type";
+import type { Property, PropertyStatus } from "@/types/Property.type";
 // Externals
 import {
-  ChevronsUpDown,
   ExternalLink,
   Home,
   MapPin,
-  PhilippinePeso,
   Phone,
   Trash2,
+  MoreVertical,
+  Check,
+  X,
+  Clock,
 } from "lucide-react";
-import { propertyStatus } from "@/lib/constant";
+import { Skeleton } from "../ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: Property;
@@ -39,6 +35,34 @@ interface PropertyCardProps {
   handleUpdateStatus: ({ id, status }: { id: number; status: string }) => void;
   isLoading: boolean;
 }
+
+const statusConfig: Record<
+  PropertyStatus,
+  {
+    label: string;
+    variant: "warning" | "success" | "destructive";
+    icon: React.ReactNode;
+  }
+> = {
+  pending: {
+    label: "Pending",
+    variant: "warning",
+    icon: <Clock className="w-3 h-3" />,
+  },
+  reviewed: {
+    label: "Reviewed",
+    variant: "success",
+    icon: <Check className="w-3 h-3" />,
+  },
+  rejected: {
+    label: "Rejected",
+    variant: "destructive",
+    icon: <X className="w-3 h-3" />,
+  },
+};
+
+const statusActions: PropertyStatus[] = ["pending", "reviewed", "rejected"];
+
 export default function PropertyCard({
   property,
   setSelectedPropertyId,
@@ -46,99 +70,158 @@ export default function PropertyCard({
   handleUpdateStatus,
   isLoading = false,
 }: PropertyCardProps) {
+  const currentStatus = statusConfig[property.status];
+  const availableStatusActions = statusActions.filter(
+    (status) => status !== property.status,
+  );
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
   return (
-    <Card className="max-w-md pt-0">
-      <CardContent className="px-0">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group flex flex-col py-0">
+      {/* Image with Status Badge Overlay */}
+      <div className="relative">
         <img
           src={property.image || "/images/img-not-found.png"}
           alt={property.property_name}
-          className="aspect-video h-60 rounded-t-xl object-cover bg-gray-300"
+          className="aspect-video h-48 w-full object-cover bg-gray-300 group-hover:scale-105 transition-transform duration-300"
         />
-      </CardContent>
-      <CardHeader>
-        <CardTitle>{property.property_name}</CardTitle>
-        <CardDescription className="overflow-wrap space-y-1.5 min-w-0">
-          <p>{property.notes}</p>
 
-          <p className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" /> {property.location}
-          </p>
+        {/* Status Badge Overlay */}
+        <div className="absolute top-3 right-3">
+          <Badge
+            variant={currentStatus.variant}
+            className="shadow-md flex items-center gap-1.5"
+          >
+            {currentStatus.icon}
+            {currentStatus.label}
+          </Badge>
+        </div>
+      </div>
 
-          <p className="flex items-center gap-2">
-            <Home className="w-4 h-4" /> {property.property_type}
-          </p>
+      <CardHeader className="pb-3">
+        {/* Property Name */}
+        <CardTitle className="text-xl line-clamp-1">
+          {property.property_name}
+        </CardTitle>
 
-          <p className="flex items-center gap-2">
-            <PhilippinePeso className="w-4 h-4" /> {property.rent_price}
-          </p>
+        {/* Price - Prominent Display */}
+        <div className="text-2xl font-bold text-primary mt-1">
+          {formatPrice(property.rent_price)}
+          <span className="text-sm font-normal text-muted-foreground ml-1">
+            /month
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-3 pb-4 flex flex-col flex-1">
+        {/* Property Details */}
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 shrink-0 text-primary" />
+            <span className="line-clamp-1">{property.location}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Home className="w-4 h-4 shrink-0 text-primary" />
+            <span>{property.property_type}</span>
+          </div>
 
           {property.contact && (
-            <p className="flex items-center gap-2">
-              <Phone className="w-4 h-4" /> {property.contact}
-            </p>
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 shrink-0 text-primary" />
+              <span>{property.contact}</span>
+            </div>
           )}
+        </div>
 
-          <div className="mt-2 ">
-            <p className="flex items-center gap-2 ">
-              <ExternalLink className="w-4 h-4 shrink-0" />{" "}
-              <Link
-                href={property.url_link}
-                target="_blank"
-                className="text-blue-600 hover:text-blue-700 transition-colors block truncate min-w-0"
-                title={property.url_link}
-              >
-                {property.url_link}
-              </Link>
-            </p>
-          </div>
-        </CardDescription>
-      </CardHeader>
-      <CardFooter className="gap-3 max-sm:flex-col max-sm:items-stretch mt-auto">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {/* Notes */}
+        {property.notes && (
+          <p className="text-sm text-muted-foreground line-clamp-2 pt-2 border-t">
+            {property.notes}
+          </p>
+        )}
+
+        {/* External Link */}
+        <div className="pt-2">
+          <Link
+            href={property.url_link}
+            target="_blank"
+            className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 transition-colors group/link"
+          >
+            <ExternalLink className="w-4 h-4 shrink-0" />
+            <span className="truncate group-hover/link:underline">
+              View Listing
+            </span>
+          </Link>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t pt-4 mt-auto">
+          {/* Status Action Buttons */}
+          <div className="flex items-center justify-between gap-2 relative">
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Quick Actions:
+              </p>
+
+              <div className="flex gap-1.5">
+                {isLoading ? (
+                  <>
+                    <Skeleton className="h-7 w-20" />
+                    <Skeleton className="h-7 w-20" />
+                  </>
+                ) : (
+                  availableStatusActions.map((status) => {
+                    const config = statusConfig[status];
+                    return (
+                      <Button
+                        key={status}
+                        size="sm"
+                        variant="outline"
+                        className={cn(
+                          "h-7 text-xs gap-1.5 hover:scale-105 transition-transform",
+                          status === "reviewed" &&
+                            "hover:bg-green-50 hover:border-green-500 hover:text-green-700",
+                          status === "rejected" &&
+                            "hover:bg-red-50 hover:border-red-500 hover:text-red-700",
+                          status === "pending" &&
+                            "hover:bg-amber-50 hover:border-amber-500 hover:text-amber-700",
+                        )}
+                        onClick={() =>
+                          handleUpdateStatus({ id: property.id, status })
+                        }
+                      >
+                        {config.icon}
+                        {config.label}
+                      </Button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
             <Button
-              variant="outline"
-              className="capitalize gap-2"
-              disabled={isLoading}
+              variant="ghost"
+              size="icon-sm"
+              className="shrink-0 text-destructive bg-red-50 hover:bg-red-100 hover:text-destructive absolute top-0 right-0 transition-colors"
+              onClick={() => {
+                setSelectedPropertyId(property.id);
+                setIsOpenDialog(true);
+              }}
             >
-              {property.status}
-              <ChevronsUpDown className="w-4 h-4" />
+              <Trash2 className="w-4 h-4" />
             </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent className="w-56" align="start">
-            <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              {propertyStatus.map((status) => {
-                if (status === property.status) return null;
-                return (
-                  <DropdownMenuItem
-                    key={status}
-                    className="capitalize"
-                    onClick={() =>
-                      handleUpdateStatus({ id: property.id, status })
-                    }
-                  >
-                    {status}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Button
-          variant="outline"
-          onClick={() => {
-            setSelectedPropertyId(property.id);
-            setIsOpenDialog(true);
-          }}
-          className="text-destructive hover:bg-destructive/80 hover:text-white transition-colors"
-        >
-          <Trash2 />
-        </Button>
-      </CardFooter>
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 }

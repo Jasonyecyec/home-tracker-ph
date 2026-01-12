@@ -63,28 +63,49 @@ export default function PropertyPage() {
     },
   });
 
-  const { mutateAsync: updatePropertyStatus, isPending: isUpdating } =
-    useMutation({
-      mutationFn: async ({ id, status }: { id: number; status: string }) => {
-        const response = await fetch(`/api/properties/${id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ status }),
-        });
+  const {
+    mutateAsync: updatePropertyStatus,
+    isPending: isUpdating,
+    variables,
+  } = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const response = await fetch(`/api/properties/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
 
-        if (!response.ok) {
-          throw new Error();
-        }
+      if (!response.ok) {
+        throw new Error();
+      }
 
-        return response.json();
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ["properties"] });
-        toast.success(data.message || "Property status updated successfully");
-      },
-      onError: () => {
-        toast.error("Failed to update property status");
-      },
-    });
+      return response.json();
+    },
+    onMutate: async (variables) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["properties"] });
+
+      // Snapshot previous value
+      const previousProperties = queryClient.getQueryData(["properties"]);
+
+      // Optimistically update
+      queryClient.setQueryData(["properties"], (old: Property[]) =>
+        old?.map((prop) =>
+          prop.id === variables.id
+            ? { ...prop, status: variables.status }
+            : prop,
+        ),
+      );
+
+      return { previousProperties };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      toast.success(data.message || "Property status updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update property status");
+    },
+  });
 
   const hanndleDeleteProperty = async () => {
     if (!selectedPropertyId) return;
@@ -115,7 +136,7 @@ export default function PropertyPage() {
             setSelectedPropertyId={setSelectedPropertyId}
             setIsOpenDialog={setIsOpenDialog}
             handleUpdateStatus={updatePropertyStatus}
-            isLoading={isUpdating}
+            isLoading={isUpdating && variables?.id === property.id}
           />
         ))}
       </div>
