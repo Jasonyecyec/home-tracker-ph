@@ -3,12 +3,21 @@ import { createClient } from "@/lib/supabase/server";
 import { propertySchema } from "@/schemas/property.schema";
 import { uploadImageToSupabase, getImageUrl } from "@/lib/storage";
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get("status");
+
+  let query = supabase
     .from("properties")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if (status && status !== "all") {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query;
 
   if (error)
     return NextResponse.json({ message: error.message }, { status: 500 });

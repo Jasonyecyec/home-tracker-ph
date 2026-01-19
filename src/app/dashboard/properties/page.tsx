@@ -15,6 +15,7 @@ import {
 import PropertyCard from "@/components/properties/property-card";
 import PropertyForm from "@/components/properties/property-form";
 import { Button } from "@/components/ui/button";
+import PropertyFilter from "@/components/properties/property-filter";
 // Types
 import { Property } from "@/types/Property.type";
 // Externals
@@ -28,12 +29,16 @@ export default function PropertyPage() {
   const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(
     null,
   );
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const queryClient = useQueryClient();
 
-  const { isPending, error, data } = useQuery({
-    queryKey: ["properties"],
+  const { isPending, isError, error, data } = useQuery({
+    queryKey: ["properties", statusFilter],
     queryFn: async () => {
-      const response = await fetch("/api/properties");
+      const params = new URLSearchParams();
+      if (statusFilter) params.set("status", statusFilter);
+
+      const response = await fetch(`/api/properties?${params.toString()}`);
 
       if (!response.ok) toast.error("Failed to load properties");
 
@@ -115,8 +120,12 @@ export default function PropertyPage() {
 
   if (isPending) return <div>Loading...</div>;
 
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
-    <div className="p-5 border rounded-md">
+    <div className="h-[calc(100vh-6rem)] p-5 border rounded-md space-y-5 overflow-y-scroll ">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold text-foreground">Property List</h2>
 
@@ -126,21 +135,29 @@ export default function PropertyPage() {
         </Button>
       </div>
 
+      <PropertyFilter value={statusFilter} onChange={setStatusFilter} />
+
       <PropertyForm isOpen={isOpenForm} onChange={setIsOpenForm} />
+      {data?.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {data.map((property: Property) => (
+            <PropertyCard
+              property={property}
+              key={property.id}
+              setSelectedPropertyId={setSelectedPropertyId}
+              setIsOpenDialog={setIsOpenDialog}
+              handleUpdateStatus={updatePropertyStatus}
+              isLoading={isUpdating && variables?.id === property.id}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center w-full text-xl text-muted-foreground">
+          <h1>No properties found.</h1>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
-        {data?.map((property: Property) => (
-          <PropertyCard
-            property={property}
-            key={property.id}
-            setSelectedPropertyId={setSelectedPropertyId}
-            setIsOpenDialog={setIsOpenDialog}
-            handleUpdateStatus={updatePropertyStatus}
-            isLoading={isUpdating && variables?.id === property.id}
-          />
-        ))}
-      </div>
-
+      {/* Delete Dialog */}
       <AlertDialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -63,7 +63,7 @@ export default function StatCard({
 export function StatCardSkeleton() {
   return (
     <Card className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-muted/10" />
+      <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-muted/10" />
       <div className="relative">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <Skeleton className="h-4 w-28" />
