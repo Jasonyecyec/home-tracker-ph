@@ -37,6 +37,17 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-brand-canvas: var(--brand-canvas);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-soft: var(--brand-ink-soft);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-muted-light: var(--brand-muted-light);
+  --color-brand-border: var(--brand-border);
+  --color-brand-input: var(--brand-input);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-ring: var(--brand-ring);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -76,6 +87,17 @@
   --sidebar-accent-foreground: hsl(240 5.9% 10%);
   --sidebar-border: hsl(220 13% 91%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --brand-canvas: #f6f3ec;
+  --brand-surface: #fbfaf7;
+  --brand-ink: #17231f;
+  --brand-ink-soft: #28352f;
+  --brand-muted: #657068;
+  --brand-muted-light: #8a938c;
+  --brand-border: #ded7c8;
+  --brand-input: #d8d1c4;
+  --brand-hover: #e9e3d8;
+  --brand-primary-hover: #22362f;
+  --brand-ring: #166534;
 }
 
 .dark {

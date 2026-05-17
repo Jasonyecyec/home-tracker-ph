@@ -14,7 +14,10 @@ interface PropertyFilterProps {
   onChange: (value: string) => void;
 }
 
-export default function PropertyFilter({ value, onChange }: PropertyFilterProps) {
+export default function PropertyFilter({
+  value,
+  onChange,
+}: PropertyFilterProps) {
   const IconColor = {
     pending: "text-amber-500 fill-amber-500",
     reviewed: "text-green-500 fill-green-500",
