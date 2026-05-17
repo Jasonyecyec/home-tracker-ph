@@ -1,9 +1,10 @@
+// Types
+import type { PropertyStatus } from "@/types/Property.type";
+
 export interface DashboardStats {
   total: number;
-  saved: number;
-  contacted: number;
-  viewing_scheduled: number;
-  viewed: number;
+  needsAction: number;
+  viewingScheduled: number;
   shortlisted: number;
-  rejected: number;
+  statusCounts: Record<PropertyStatus, number>;
 }

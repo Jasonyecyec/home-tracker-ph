@@ -15,7 +15,7 @@ export default function MainLayout({
     <SidebarProvider>
       <AppSidebar />
       <main className="w-full">
-        <div className="p-2">
+        <div className="p-2 flex gap-2 items-center ">
           <Tooltip>
             <TooltipTrigger asChild>
               <SidebarTrigger className="cursor-pointer" />

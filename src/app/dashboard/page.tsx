@@ -1,17 +1,11 @@
 "use client";
+
 // Externals
 import { useQuery } from "@tanstack/react-query";
-import {
-  Bookmark,
-  CalendarClock,
-  CheckCircle2,
-  Home,
-  MessageCircle,
-  Star,
-  XCircle,
-} from "lucide-react";
+import { CalendarClock, Home, ListChecks, Star } from "lucide-react";
 // Components
 import StatCard, { StatCardSkeleton } from "@/components/dashboard/stat-card";
+import PageHeader from "@/components/layout/page-header";
 // Types
 import type { DashboardStats } from "@/types/Dashboard.type";
 
@@ -28,81 +22,55 @@ export default function Dashboard() {
   const stats = [
     {
       title: "Total Properties",
-      value: data?.total || 0,
+      value: data?.total ?? 0,
       icon: Home,
       description: "All tracked properties",
-      iconColor: "text-blue-600",
-      iconBgColor: "bg-blue-50",
+      iconColor: "text-brand-ink",
+      iconBgColor: "bg-stone-100",
     },
     {
-      title: "Saved",
-      value: data?.saved || 0,
-      icon: Bookmark,
-      description: "Not contacted yet",
-      iconColor: "text-slate-600",
-      iconBgColor: "bg-slate-50",
-    },
-    {
-      title: "Contacted",
-      value: data?.contacted || 0,
-      icon: MessageCircle,
-      description: "Owner or agent contacted",
-      iconColor: "text-blue-600",
-      iconBgColor: "bg-blue-50",
+      title: "Needs Action",
+      value: data?.needsAction ?? 0,
+      icon: ListChecks,
+      description: "Saved or contacted",
+      iconColor: "text-emerald-700",
+      iconBgColor: "bg-emerald-50",
     },
     {
       title: "Viewing Scheduled",
-      value: data?.viewing_scheduled || 0,
+      value: data?.viewingScheduled ?? 0,
       icon: CalendarClock,
-      description: "Visit planned",
+      description: "Visits planned",
       iconColor: "text-amber-600",
       iconBgColor: "bg-amber-50",
     },
     {
-      title: "Viewed",
-      value: data?.viewed || 0,
-      icon: CheckCircle2,
-      description: "Already inspected",
-      iconColor: "text-indigo-600",
-      iconBgColor: "bg-indigo-50",
-    },
-    {
       title: "Shortlisted",
-      value: data?.shortlisted || 0,
+      value: data?.shortlisted ?? 0,
       icon: Star,
-      description: "Strong candidates",
-      iconColor: "text-green-600",
-      iconBgColor: "bg-green-50",
-    },
-    {
-      title: "Rejected",
-      value: data?.rejected || 0,
-      icon: XCircle,
-      description: "Not suitable",
-      iconColor: "text-red-600",
-      iconBgColor: "bg-red-50",
+      description: "Best candidates",
+      iconColor: "text-green-700",
+      iconBgColor: "bg-emerald-50",
     },
   ];
 
   if (error) {
     return (
-      <div className="text-destructive text-sm">
-        Failed to load statistics. Please try again.
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-5 text-sm text-destructive">
+        Failed to load statistics. Please refresh the page.
       </div>
     );
   }
 
   return (
-    <div className="p-5 space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-foreground">Dashboard</h2>
-        <p className="text-muted-foreground mt-1">
-          Overview of your property tracking
-        </p>
-      </div>
+    <div className="min-h-[calc(100vh-8rem)] space-y-5 rounded-2xl text-brand-ink">
+      <PageHeader
+        title="Dashboard"
+        description="Track what needs action, what is scheduled, and which homes are still worth pursuing."
+      />
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {isPending
           ? stats.map((stat) => (
               <StatCardSkeleton key={`${stat.title}-skeleton`} />

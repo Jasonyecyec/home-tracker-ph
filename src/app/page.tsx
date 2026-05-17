@@ -105,7 +105,7 @@ export default function Home() {
                   error={errors.email?.message}
                   disabled={isSubmitting}
                   aria-invalid={Boolean(errors.email)}
-                  className="h-12 rounded-xl border-brand-input bg-brand-surface pl-10 text-brand-ink shadow-none transition-all placeholder:text-brand-muted-light focus-visible:border-brand-ring focus-visible:ring-brand-ring/15"
+                  className="h-12 rounded-xl border-brand-input bg-brand-surface pl-10 text-brand-ink shadow-none transition-[border-color,box-shadow] placeholder:text-brand-muted-light focus-visible:border-brand-ring focus-visible:ring-brand-ring/15"
                 />
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function Home() {
                   {...register("password")}
                   disabled={isSubmitting}
                   aria-invalid={Boolean(errors.password)}
-                  className="h-12 rounded-xl border-brand-input bg-brand-surface pl-10 pr-12 text-brand-ink shadow-none transition-all focus-visible:border-brand-ring focus-visible:ring-brand-ring/15"
+                  className="h-12 rounded-xl border-brand-input bg-brand-surface pl-10 pr-12 text-brand-ink shadow-none transition-[border-color,box-shadow] focus-visible:border-brand-ring focus-visible:ring-brand-ring/15"
                 />
                 <button
                   type="button"
@@ -154,7 +154,7 @@ export default function Home() {
               disabled={isSubmitting}
               className="h-12 w-full rounded-xl bg-brand-ink text-base font-semibold text-white transition hover:bg-brand-primary-hover hover:shadow-[0_18px_36px_rgba(23,35,31,0.3)]"
             >
-              {isSubmitting ? "Signing in..." : "Sign in"}
+              {isSubmitting ? "Signing in…" : "Sign in"}
               {!isSubmitting && (
                 <ArrowRight className="size-4" aria-hidden="true" />
               )}
