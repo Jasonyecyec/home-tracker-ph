@@ -1,32 +1,27 @@
-import Link from "next/link";
-// Components
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-// Types
-import type { Property, PropertyStatus } from "@/types/Property.type";
 // Externals
 import {
+  Bookmark,
+  CalendarClock,
+  Check,
   ExternalLink,
   Home,
   MapPin,
+  MessageCircle,
   Phone,
+  Star,
   Trash2,
-  MoreVertical,
-  Check,
   X,
-  Clock,
 } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+// Components
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { propertyStatus } from "@/lib/constant";
 import { cn } from "@/lib/utils";
+// Types
+import type { Property, PropertyStatus } from "@/types/Property.type";
+import { Skeleton } from "../ui/skeleton";
 
 interface PropertyCardProps {
   property: Property;
@@ -40,28 +35,55 @@ const statusConfig: Record<
   PropertyStatus,
   {
     label: string;
-    variant: "warning" | "success" | "destructive";
+    variant: "default" | "secondary" | "warning" | "success" | "destructive";
     icon: React.ReactNode;
+    actionClassName: string;
   }
 > = {
-  pending: {
-    label: "Pending",
-    variant: "warning",
-    icon: <Clock className="w-3 h-3" />,
+  saved: {
+    label: "Saved",
+    variant: "secondary",
+    icon: <Bookmark className="w-3 h-3" />,
+    actionClassName:
+      "hover:bg-slate-50 hover:border-slate-500 hover:text-slate-700",
   },
-  reviewed: {
-    label: "Reviewed",
+  contacted: {
+    label: "Contacted",
+    variant: "default",
+    icon: <MessageCircle className="w-3 h-3" />,
+    actionClassName:
+      "hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700",
+  },
+  viewing_scheduled: {
+    label: "Viewing Scheduled",
+    variant: "warning",
+    icon: <CalendarClock className="w-3 h-3" />,
+    actionClassName:
+      "hover:bg-amber-50 hover:border-amber-500 hover:text-amber-700",
+  },
+  viewed: {
+    label: "Viewed",
     variant: "success",
     icon: <Check className="w-3 h-3" />,
+    actionClassName:
+      "hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700",
+  },
+  shortlisted: {
+    label: "Shortlisted",
+    variant: "success",
+    icon: <Star className="w-3 h-3" />,
+    actionClassName:
+      "hover:bg-green-50 hover:border-green-500 hover:text-green-700",
   },
   rejected: {
     label: "Rejected",
     variant: "destructive",
     icon: <X className="w-3 h-3" />,
+    actionClassName: "hover:bg-red-50 hover:border-red-500 hover:text-red-700",
   },
 };
 
-const statusActions: PropertyStatus[] = ["pending", "reviewed", "rejected"];
+const statusActions = propertyStatus;
 
 export default function PropertyCard({
   property,
@@ -172,7 +194,7 @@ export default function PropertyCard({
                 Quick Actions:
               </p>
 
-              <div className="flex gap-1.5">
+              <div className="flex flex-wrap gap-1.5 pr-10">
                 {isLoading ? (
                   <>
                     <Skeleton className="h-7 w-20" />
@@ -188,12 +210,7 @@ export default function PropertyCard({
                         variant="outline"
                         className={cn(
                           "h-7 text-xs gap-1.5 hover:scale-105 transition-transform",
-                          status === "reviewed" &&
-                            "hover:bg-green-50 hover:border-green-500 hover:text-green-700",
-                          status === "rejected" &&
-                            "hover:bg-red-50 hover:border-red-500 hover:text-red-700",
-                          status === "pending" &&
-                            "hover:bg-amber-50 hover:border-amber-500 hover:text-amber-700",
+                          config.actionClassName,
                         )}
                         onClick={() =>
                           handleUpdateStatus({ id: property.id, status })

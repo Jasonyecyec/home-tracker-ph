@@ -1,19 +1,26 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+// Types
+import { ClipboardPaste, Image as ImageIcon, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 //Components
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -21,15 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// Types
-import { ClipboardPaste, Upload, X, Image as ImageIcon } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
-import { PropertyFormSchema, propertySchema } from "@/schemas/property.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { propertyStatus, propertyTypes } from "@/lib/constant";
+import {
+  type PropertyFormSchema,
+  propertySchema,
+} from "@/schemas/property.schema";
 
 interface PropertyFormProps {
   isOpen: boolean;
@@ -222,7 +225,7 @@ export default function PropertyForm({ isOpen, onChange }: PropertyFormProps) {
   } = useForm<PropertyFormSchema>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
-      status: "pending",
+      status: "saved",
       image: undefined,
     },
   });

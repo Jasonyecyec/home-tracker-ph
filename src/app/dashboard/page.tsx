@@ -1,11 +1,19 @@
 "use client";
+// Externals
+import { useQuery } from "@tanstack/react-query";
+import {
+  Bookmark,
+  CalendarClock,
+  CheckCircle2,
+  Home,
+  MessageCircle,
+  Star,
+  XCircle,
+} from "lucide-react";
 // Components
 import StatCard, { StatCardSkeleton } from "@/components/dashboard/stat-card";
 // Types
-import { DashboardStats } from "@/types/Dashboard.type";
-// Externals
-import { useQuery } from "@tanstack/react-query";
-import { Home, Clock, CheckCircle2, XCircle } from "lucide-react";
+import type { DashboardStats } from "@/types/Dashboard.type";
 
 export default function Dashboard() {
   const { data, isPending, error } = useQuery<DashboardStats>({
@@ -27,18 +35,42 @@ export default function Dashboard() {
       iconBgColor: "bg-blue-50",
     },
     {
-      title: "Pending Review",
-      value: data?.pending || 0,
-      icon: Clock,
-      description: "Awaiting review",
+      title: "Saved",
+      value: data?.saved || 0,
+      icon: Bookmark,
+      description: "Not contacted yet",
+      iconColor: "text-slate-600",
+      iconBgColor: "bg-slate-50",
+    },
+    {
+      title: "Contacted",
+      value: data?.contacted || 0,
+      icon: MessageCircle,
+      description: "Owner or agent contacted",
+      iconColor: "text-blue-600",
+      iconBgColor: "bg-blue-50",
+    },
+    {
+      title: "Viewing Scheduled",
+      value: data?.viewing_scheduled || 0,
+      icon: CalendarClock,
+      description: "Visit planned",
       iconColor: "text-amber-600",
       iconBgColor: "bg-amber-50",
     },
     {
-      title: "Reviewed",
-      value: data?.reviewed || 0,
+      title: "Viewed",
+      value: data?.viewed || 0,
       icon: CheckCircle2,
-      description: "Approved properties",
+      description: "Already inspected",
+      iconColor: "text-indigo-600",
+      iconBgColor: "bg-indigo-50",
+    },
+    {
+      title: "Shortlisted",
+      value: data?.shortlisted || 0,
+      icon: Star,
+      description: "Strong candidates",
       iconColor: "text-green-600",
       iconBgColor: "bg-green-50",
     },
@@ -71,16 +103,11 @@ export default function Dashboard() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {isPending ? (
-          <>
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-          </>
-        ) : (
-          stats.map((stat) => <StatCard key={stat.title} {...stat} />)
-        )}
+        {isPending
+          ? stats.map((stat) => (
+              <StatCardSkeleton key={`${stat.title}-skeleton`} />
+            ))
+          : stats.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
     </div>
   );

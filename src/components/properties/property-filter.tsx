@@ -1,4 +1,6 @@
 // Components
+
+import { CircleIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -7,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { propertyStatus } from "@/lib/constant";
-import { CircleIcon } from "lucide-react";
+import type { PropertyStatus } from "@/types/Property.type";
 
 interface PropertyFilterProps {
   value: string;
@@ -18,12 +20,18 @@ export default function PropertyFilter({
   value,
   onChange,
 }: PropertyFilterProps) {
-  const IconColor = {
-    pending: "text-amber-500 fill-amber-500",
-    reviewed: "text-green-500 fill-green-500",
+  const iconColor: Record<PropertyStatus | "all", string> = {
+    saved: "text-slate-500 fill-slate-500",
+    contacted: "text-blue-500 fill-blue-500",
+    viewing_scheduled: "text-amber-500 fill-amber-500",
+    viewed: "text-indigo-500 fill-indigo-500",
+    shortlisted: "text-green-500 fill-green-500",
     rejected: "text-red-500 fill-red-500",
     all: "text-gray-500 fill-gray-500",
   };
+
+  const formatStatusLabel = (status: PropertyStatus) =>
+    status.replaceAll("_", " ");
 
   return (
     <div className="flex justify-end items-center gap-3">
@@ -35,16 +43,18 @@ export default function PropertyFilter({
         <SelectContent className="[&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]]:pr-8 [&_*[role=option]]:pl-2 [&_*[role=option]>span]:right-2 [&_*[role=option]>span]:left-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]>span>svg]:shrink-0">
           <SelectItem value="all">
             <span className="flex items-center gap-2">
-              <CircleIcon className={`size-2 ${IconColor["all"]}`} />
+              <CircleIcon className={`size-2 ${iconColor.all}`} />
               <span className="truncate capitalize">All</span>
             </span>
           </SelectItem>
 
-          {propertyStatus.map((status, index) => (
-            <SelectItem key={index} value={status}>
+          {propertyStatus.map((status) => (
+            <SelectItem key={status} value={status}>
               <span className="flex items-center gap-2">
-                <CircleIcon className={`size-2 ${IconColor[status]}`} />
-                <span className="truncate capitalize">{status}</span>
+                <CircleIcon className={`size-2 ${iconColor[status]}`} />
+                <span className="truncate capitalize">
+                  {formatStatusLabel(status)}
+                </span>
               </span>
             </SelectItem>
           ))}

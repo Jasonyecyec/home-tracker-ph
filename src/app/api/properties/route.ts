@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { getImageUrl, uploadImageToSupabase } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema } from "@/schemas/property.schema";
-import { uploadImageToSupabase, getImageUrl } from "@/lib/storage";
 
 export async function GET(request: Request) {
   const supabase = await createClient();

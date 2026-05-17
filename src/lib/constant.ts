@@ -1,4 +1,4 @@
-import { PropertyStatus } from "@/types/Property.type";
+import type { PropertyStatus } from "@/types/Property.type";
 
 export const propertyTypes = [
   "Condo",
@@ -10,7 +10,10 @@ export const propertyTypes = [
 ];
 
 export const propertyStatus: PropertyStatus[] = [
-  "pending",
-  "reviewed",
+  "saved",
+  "contacted",
+  "viewing_scheduled",
+  "viewed",
+  "shortlisted",
   "rejected",
 ];

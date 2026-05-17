@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
   const supabase = await createClient();
@@ -18,28 +18,50 @@ export async function GET() {
   }
 
   // Count all properties and by status in parallel
-  const [totalResult, pendingResult, reviewedResult, rejectedResult] =
-    await Promise.all([
-      supabase
-        .from("properties")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id),
-      supabase
-        .from("properties")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("status", "pending"),
-      supabase
-        .from("properties")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("status", "reviewed"),
-      supabase
-        .from("properties")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("status", "rejected"),
-    ]);
+  const [
+    totalResult,
+    savedResult,
+    contactedResult,
+    viewingScheduledResult,
+    viewedResult,
+    shortlistedResult,
+    rejectedResult,
+  ] = await Promise.all([
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id),
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "saved"),
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "contacted"),
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "viewing_scheduled"),
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "viewed"),
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "shortlisted"),
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "rejected"),
+  ]);
 
   if (totalResult.error) {
     return NextResponse.json(
@@ -50,8 +72,11 @@ export async function GET() {
 
   const stats = {
     total: totalResult.count || 0,
-    pending: pendingResult.count || 0,
-    reviewed: reviewedResult.count || 0,
+    saved: savedResult.count || 0,
+    contacted: contactedResult.count || 0,
+    viewing_scheduled: viewingScheduledResult.count || 0,
+    viewed: viewedResult.count || 0,
+    shortlisted: shortlistedResult.count || 0,
     rejected: rejectedResult.count || 0,
   };
 

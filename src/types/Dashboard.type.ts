@@ -1,6 +1,9 @@
 export interface DashboardStats {
   total: number;
-  pending: number;
-  reviewed: number;
+  saved: number;
+  contacted: number;
+  viewing_scheduled: number;
+  viewed: number;
+  shortlisted: number;
   rejected: number;
 }

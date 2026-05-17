@@ -22,4 +22,10 @@ export interface PropertyImage {
   created_at: string;
 }
 
-export type PropertyStatus = "pending" | "reviewed" | "rejected";
+export type PropertyStatus =
+  | "saved"
+  | "contacted"
+  | "viewing_scheduled"
+  | "viewed"
+  | "shortlisted"
+  | "rejected";
